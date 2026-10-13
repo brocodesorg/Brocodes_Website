@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import EmptyState from '../components/EmptyState.astro';
+import { siteConfig } from '../config/site';
+
+// Import projects data generated at build time
+import projectsData from '../data/projects.json';
+
+const projects = projectsData;
+
+// Extract unique categories and technologies for filters
+const categories = [...new Set(projects.map(p => p.category))].filter(Boolean).sort();
+const allTechnologies = [...new Set(projects.flatMap(p => p.technologies || []))].filter(Boolean).sort();
+---
+
+<BaseLayout title={siteConfig.title} description={siteConfig.description}>
+  <div class="min-h-screen flex flex-col bg-[#FAF9F6] dark:bg-[#111113] text-[#1A1A1A] dark:text-[#F3F3F3]">
+    <Header />
+
+    <main class="flex-1">
+      <!-- 3D Hero Section -->
+      <section class="relative pt-16 pb-14 sm:pt-24 sm:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+          <!-- Floating Pill -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white/90 dark:bg-white/5 border border-black/[0.08] dark:border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.04)] text-indigo-600 dark:text-indigo-400 mb-6 backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span>Creative Showcase & Software Library</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-gray-950 dark:text-white mb-6 leading-tight">
+            Creative Software <span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Projects</span>
+          </h1>
+
+          <p class="text-base sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            {siteConfig.hero.description}
+          </p>
+
+          <!-- Search & Filter Bar (3D Floating Bar) -->
+          {projects.length > 0 && (
+            <div class="mt-10 max-w-3xl mx-auto p-2 rounded-2xl bg-white/80 dark:bg-[#18181B]/80 backdrop-blur-md border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_12px_32px_-8px_rgba(0,0,0,0.08)] flex flex-col sm:flex-row gap-2">
+              <div class="flex-1 relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  id="search"
+                  placeholder="Search projects by name, tags, or features..."
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
+
+              {(categories.length > 0 || allTechnologies.length > 0) && (
+                <div class="flex items-center gap-2 border-t sm:border-t-0 sm:border-l border-gray-200 dark:border-gray-800 pt-2 sm:pt-0 sm:pl-2">
+                  {categories.length > 0 && (
+                    <select
+                      id="category-filter"
+                      class="px-3 py-2 rounded-xl text-xs font-medium bg-gray-50 dark:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/10 text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer"
+                    >
+                      <option value="">All Categories</option>
+                      {categories.map(cat => <option value={cat}>{cat}</option>)}
+                    </select>
+                  )}
+
+                  {allTechnologies.length > 0 && (
+                    <select
+                      id="tech-filter"
+                      class="px-3 py-2 rounded-xl text-xs font-medium bg-gray-50 dark:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/10 text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer"
+                    >
+                      <option value="">All Tech</option>
+                      {allTechnologies.map(tech => <option value={tech}>{tech}</option>)}
+                    </select>
+                  )}
+
+                  <button
+                    id="clear-filters"
+                    class="px-3 py-2 text-xs font-medium text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <!-- Projects Grid Section -->
+      <section class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {projects.length > 0 && (
+          <div id="results-count" class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-6">
+            Showing {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+          </div>
+        )}
+
+        <div
+          id="projects-grid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {projects.length === 0 ? (
+            <div class="col-span-full">
+              <EmptyState projects={projects} />
+            </div>
+          ) : (
+            projects.map(project => (
+              <ProjectCard project={project} />
+            ))
+          )}
+        </div>
+
+        <div id="no-results" class="hidden col-span-full text-center py-20">
+          <p class="text-gray-500 dark:text-gray-400 text-sm">No matching projects found. Try a different search term or filter.</p>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
+
+<script define:vars={{ projects }}>
+  function initFilterLogic() {
+    const searchInput = document.getElementById('search');
+    const categoryFilter = document.getElementById('category-filter');
+    const techFilter = document.getElementById('tech-filter');
+    const clearButton = document.getElementById('clear-filters');
+    const resultsCount = document.getElementById('results-count');
+    const projectsGrid = document.getElementById('projects-grid');
+    const noResults = document.getElementById('no-results');
+
+    if (!searchInput || !projectsGrid) return;
+
+    function runFilter() {
+      const q = searchInput.value.toLowerCase().trim();
+      const cat = categoryFilter?.value || '';
+      const tech = techFilter?.value || '';
+
+      const cards = projectsGrid.querySelectorAll('article');
+      let visible = 0;
+
+      projects.forEach((p, idx) => {
+        const card = cards[idx];
+        if (!card) return;
+
+        const matchQ = !q ||
+          p.title.toLowerCase().includes(q) ||
+          p.summary.toLowerCase().includes(q) ||
+          (p.technologies && p.technologies.some(t => t.toLowerCase().includes(q)));
+
+        const matchCat = !cat || p.category === cat;
+        const matchTech = !tech || (p.technologies && p.technologies.includes(tech));
+
+        if (matchQ && matchCat && matchTech) {
+          card.style.display = '';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (resultsCount) {
+        resultsCount.textContent = `Showing ${visible} ${visible === 1 ? 'project' : 'projects'}`;
+      }
+
+      if (noResults) {
+        if (visible === 0 && projects.length > 0) {
+          noResults.classList.remove('hidden');
+        } else {
+          noResults.classList.add('hidden');
+        }
+      }
+    }
+
+    searchInput?.addEventListener('input', runFilter);
+    categoryFilter?.addEventListener('change', runFilter);
+    techFilter?.addEventListener('change', runFilter);
+    clearButton?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (categoryFilter) categoryFilter.value = '';
+      if (techFilter) techFilter.value = '';
+      runFilter();
+    });
+  }
+
+  initFilterLogic();
+  document.addEventListener('astro:after-swap', initFilterLogic);
+</script>

@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description, ogImage } = Astro.props;
+
+import { siteConfig } from '../config/site';
+
+const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.title;
+const pageDescription = description || siteConfig.description;
+const canonicalURL = new URL(Astro.url.pathname, siteConfig.url);
+const ogImageURL = ogImage
+  ? new URL(ogImage, siteConfig.url)
+  : new URL(siteConfig.ogImage, siteConfig.url);
+---
+
+<!doctype html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={ogImageURL} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={pageDescription} />
+    <meta property="twitter:image" content={ogImageURL} />
+
+    <!-- Theme script - defaults to milky pearl light mode unless dark is explicitly saved -->
+    <script is:inline>
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+  <body class="bg-[#FAF9F6] text-[#1A1A1A] dark:bg-[#111112] dark:text-[#F3F3F3] antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300">
+    <slot />
+  </body>
+</html>

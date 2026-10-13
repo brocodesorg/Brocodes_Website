@@ -1,0 +1,255 @@
+---
+export interface Props {
+  project: any;
+}
+
+const { project } = Astro.props;
+
+const coverImage = project.cover
+  ? `/media/projects/${project.slug}/${project.cover.split('/').pop()}`
+  : null;
+
+const screenshots = project.screenshots?.map((s: any) => ({
+  ...s,
+  url: `/media/projects/${project.slug}/${s.path.split('/').pop()}`
+})) || [];
+
+const displayImages = screenshots.length > 0 ? screenshots : (coverImage ? [{ url: coverImage, alt: project.title }] : []);
+
+const videoSrc = project.videoLocal
+  ? `/media/projects/${project.slug}/${project.videoLocal.split('/').pop()}`
+  : (project.videoUrl || null);
+---
+
+<article class="group relative card-3d rounded-2xl overflow-hidden flex flex-col h-full bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A]">
+  <!-- Media Showcase: Slideshow / Video -->
+  <div class="relative aspect-video w-full bg-gray-100 dark:bg-[#121214] overflow-hidden select-none">
+    {displayImages.length > 0 ? (
+      <div
+        class="project-carousel relative w-full h-full"
+        data-carousel={project.slug}
+        role="region"
+        aria-label={`${project.title} gallery`}
+      >
+        {displayImages.map((img: any, index: number) => (
+          <img
+            src={img.url}
+            alt={img.alt || `${project.title} preview ${index + 1}`}
+            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out"
+            style={`opacity: ${index === 0 ? '1' : '0'}`}
+            loading="lazy"
+          />
+        ))}
+
+        {displayImages.length > 1 && (
+          <>
+            <!-- Previous Button with crisp Chevron Icon -->
+            <button
+              type="button"
+              class="carousel-prev absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 hover:scale-110 active:scale-95 z-20"
+              aria-label="Previous screenshot"
+            >
+              <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <!-- Next Button with crisp Chevron Icon -->
+            <button
+              type="button"
+              class="carousel-next absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-md opacity-0 group-hover:opacity-100 focus:opacity-100 hover:scale-110 active:scale-95 z-20"
+              aria-label="Next screenshot"
+            >
+              <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <!-- Dot Indicators -->
+            <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm z-20" role="tablist">
+              {displayImages.map((_: any, index: number) => (
+                <button
+                  type="button"
+                  class="carousel-indicator w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  style={`background-color: ${index === 0 ? 'white' : 'rgba(255, 255, 255, 0.4)'}; transform: ${index === 0 ? 'scale(1.25)' : 'scale(1)'}`}
+                  aria-label={`Go to slide ${index + 1}`}
+                  role="tab"
+                  data-index={index}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    ) : videoSrc ? (
+      <div class="relative w-full h-full bg-black flex items-center justify-center">
+        <video
+          src={videoSrc}
+          class="w-full h-full object-cover"
+          muted
+          loop
+          playsinline
+          autoplay
+        />
+      </div>
+    ) : (
+      <div class="w-full h-full bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 dark:from-indigo-950/40 dark:to-purple-950/40 flex items-center justify-center">
+        <span class="text-3xl font-black tracking-widest text-indigo-400/80 dark:text-indigo-500/80">
+          {project.title.substring(0, 2).toUpperCase()}
+        </span>
+      </div>
+    )}
+
+    {/* Video Badge Overlay */}
+    {videoSrc && (
+      <div class="absolute top-3 right-3 z-20 pointer-events-none inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/75 backdrop-blur-md text-white border border-white/10 shadow-sm">
+        <svg class="w-3 h-3 text-red-400 fill-current" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <span>Video</span>
+      </div>
+    )}
+  </div>
+
+  <!-- Card Details -->
+  <div class="p-5 sm:p-6 flex-1 flex flex-col pointer-events-none">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        {project.title}
+      </h3>
+      {project.year && (
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/10 text-gray-600 dark:text-gray-300 flex-shrink-0">
+          {project.year}
+        </span>
+      )}
+    </div>
+
+    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed flex-1">
+      {project.summary}
+    </p>
+
+    <!-- Tech Badges -->
+    {project.technologies && project.technologies.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        {project.technologies.slice(0, 4).map((tech: string) => (
+          <span class="px-2 py-0.5 text-[11px] font-medium bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 rounded-md border border-indigo-100 dark:border-indigo-900/40">
+            {tech}
+          </span>
+        ))}
+        {project.technologies.length > 4 && (
+          <span class="px-2 py-0.5 text-[11px] font-medium bg-black/5 dark:bg-white/5 text-gray-500 dark:text-gray-400 rounded-md">
+            +{project.technologies.length - 4}
+          </span>
+        )}
+      </div>
+    )}
+
+    {project.category && (
+      <div class="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+        {project.category}
+      </div>
+    )}
+  </div>
+
+  <!-- Clickable Overlay Link to Project Detail -->
+  <a
+    href={`/projects/${project.slug}/`}
+    class="absolute inset-0 z-10"
+    aria-label={`Open ${project.title} details`}
+  >
+    <span class="sr-only">View project details</span>
+  </a>
+</article>
+
+<script>
+  function initTileCarousels() {
+    const carousels = document.querySelectorAll('[data-carousel]');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    carousels.forEach((carousel) => {
+      const images = carousel.querySelectorAll('img');
+      const indicators = carousel.querySelectorAll('.carousel-indicator');
+      const prevBtn = carousel.querySelector('.carousel-prev');
+      const nextBtn = carousel.querySelector('.carousel-next');
+
+      if (images.length <= 1) return;
+
+      let currentIndex = 0;
+      let autoplayInterval: number | null = null;
+      let isPaused = false;
+
+      function showImage(index: number) {
+        images.forEach((img, i) => {
+          (img as HTMLElement).style.opacity = i === index ? '1' : '0';
+        });
+        indicators.forEach((indicator, i) => {
+          const el = indicator as HTMLElement;
+          el.style.backgroundColor = i === index ? 'white' : 'rgba(255, 255, 255, 0.4)';
+          el.style.transform = i === index ? 'scale(1.25)' : 'scale(1)';
+        });
+        currentIndex = index;
+      }
+
+      function nextImage() {
+        showImage((currentIndex + 1) % images.length);
+      }
+
+      function prevImage() {
+        showImage((currentIndex - 1 + images.length) % images.length);
+      }
+
+      function startAutoplay() {
+        if (prefersReducedMotion || isPaused) return;
+        stopAutoplay();
+        autoplayInterval = window.setInterval(nextImage, 4500);
+      }
+
+      function stopAutoplay() {
+        if (autoplayInterval) {
+          clearInterval(autoplayInterval);
+          autoplayInterval = null;
+        }
+      }
+
+      // Prev/Next Click Handlers
+      prevBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        prevImage();
+        stopAutoplay();
+        isPaused = true;
+      });
+
+      nextBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        nextImage();
+        stopAutoplay();
+        isPaused = true;
+      });
+
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          showImage(index);
+          stopAutoplay();
+          isPaused = true;
+        });
+      });
+
+      // Pause on hover
+      carousel.addEventListener('mouseenter', stopAutoplay);
+      carousel.addEventListener('mouseleave', () => {
+        if (!isPaused) startAutoplay();
+      });
+
+      if (!prefersReducedMotion) {
+        startAutoplay();
+      }
+    });
+  }
+
+  initTileCarousels();
+  document.addEventListener('astro:after-swap', initTileCarousels);
+</script>

@@ -1,0 +1,49 @@
+---
+import { siteConfig } from '../config/site';
+---
+
+<footer class="mt-auto border-t border-[#EAE8E3] dark:border-[#27272A] bg-white/70 dark:bg-[#111113]/70 backdrop-blur-sm py-8 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          © {new Date().getFullYear()} <span class="font-bold text-gray-900 dark:text-white">{siteConfig.name}</span>. All rights reserved.
+        </p>
+      </div>
+
+      {(siteConfig.contact.github || siteConfig.contact.twitter || siteConfig.contact.linkedin || siteConfig.contact.email) && (
+        <div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+          {siteConfig.contact.github && (
+            <a
+              href={siteConfig.contact.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              GitHub
+            </a>
+          )}
+          {siteConfig.contact.twitter && (
+            <a
+              href={siteConfig.contact.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              Twitter
+            </a>
+          )}
+          {siteConfig.contact.email && (
+            <a
+              href={`mailto:${siteConfig.contact.email}`}
+              class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              Contact
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+</footer>
