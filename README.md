@@ -1,6 +1,6 @@
 # BroCodes 🚀
 
-**BroCodes** is a high-performance, visually engaging showcase website and portfolio for creative software projects.
+> **BroCodes** — The official digital showcase & portfolio for creative, reel-worthy software projects.
 
 Built with a **milky pearl / warm-white** light theme and **deep charcoal** dark theme, it features interactive tile cards with screenshot slideshows and video previews, detailed project documentation pages, and automated build-time ZIP generation for direct project downloads.
 
