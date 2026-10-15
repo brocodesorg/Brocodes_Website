@@ -20,7 +20,7 @@ export const siteConfig = {
 
   // SEO and social
   url: process.env.PUBLIC_SITE_URL || 'https://example.com',
-  ogImage: '/og-image.png', // Optional
+  ogImage: '/logo.jpg', // 3D Robot Mascot & BroCodes 3D Logo
 
   // Projects per page
   projectsPerPage: 12,
