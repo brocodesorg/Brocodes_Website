@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import ThreeCanvas from '../../components/ThreeCanvas.astro';
 import { siteConfig } from '../../config/site';
 
 // Import projects data
@@ -45,52 +46,55 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
   description={project.summary}
   ogImage={coverImage || screenshots[0]?.url}
 >
-  <div class="min-h-screen flex flex-col bg-[#FAF9F6] dark:bg-[#111113] text-[#1A1A1A] dark:text-[#F3F3F3]">
+  <!-- Interactive 3D WebGL Constellation & Flux Field -->
+  <ThreeCanvas />
+
+  <div class="min-h-screen flex flex-col relative z-10">
     <Header />
 
-    <main class="flex-1 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <main class="flex-1 py-8 sm:py-14 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">
         <!-- Back Navigation -->
-        <nav class="mb-6">
+        <nav class="mb-8">
           <a
             href="/"
-            class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] shadow-sm hover:border-indigo-500 text-gray-700 dark:text-gray-300 transition-all"
+            class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl bg-white/80 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 shadow-sm hover:border-indigo-500 text-gray-700 dark:text-gray-300 backdrop-blur-md hover:-translate-x-1 transition-all"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Projects
+            All Projects
           </a>
         </nav>
 
         <!-- Project Title Header -->
-        <header class="mb-8">
-          <div class="flex flex-wrap items-center gap-2 mb-3">
+        <header class="mb-10">
+          <div class="flex flex-wrap items-center gap-2.5 mb-4">
             {project.category && (
-              <span class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
+              <span class="px-3 py-1 text-xs font-bold uppercase tracking-widest rounded-lg bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-900/40 backdrop-blur-sm">
                 {project.category}
               </span>
             )}
             {project.year && (
-              <span class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-black/5 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+              <span class="px-3 py-1 text-xs font-mono font-bold rounded-lg bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-300">
                 {project.year}
               </span>
             )}
           </div>
 
-          <h1 class="text-3xl sm:text-5xl font-black text-gray-950 dark:text-white tracking-tight mb-4">
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-950 dark:text-white tracking-tight mb-4">
             {project.title}
           </h1>
 
-          <p class="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed">
+          <p class="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed font-normal">
             {project.summary}
           </p>
 
           <!-- Technology Badges -->
           {project.technologies && project.technologies.length > 0 && (
-            <div class="flex flex-wrap gap-2 mt-4">
+            <div class="flex flex-wrap gap-2 mt-5">
               {project.technologies.map((tech: string) => (
-                <span class="px-3 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] shadow-sm text-gray-800 dark:text-gray-200">
+                <span class="px-3 py-1 text-xs font-semibold rounded-lg bg-white/80 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 shadow-sm text-gray-800 dark:text-gray-200 backdrop-blur-sm">
                   {tech}
                 </span>
               ))}
@@ -100,10 +104,10 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
         <!-- Showcase Media: Interactive Hero Slideshow with Arrow Controls -->
         {(displayImages.length > 0 || videoUrl) && (
-          <section class="mb-8">
+          <section class="mb-10">
             <div
               id="detail-slideshow"
-              class="relative aspect-video w-full rounded-2xl overflow-hidden bg-gray-950 border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_16px_36px_-10px_rgba(0,0,0,0.15)] group select-none"
+              class="relative aspect-video w-full rounded-2xl overflow-hidden bg-gray-950 border border-black/[0.08] dark:border-white/10 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.25)] group select-none corner-crosshair"
             >
               <!-- Images List -->
               {displayImages.map((img: any, idx: number) => (
@@ -115,7 +119,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                   <img
                     src={img.url}
                     alt={img.alt || `${project.title} screenshot ${idx + 1}`}
-                    class="w-full h-full object-contain bg-black/80"
+                    class="w-full h-full object-contain bg-black/90"
                   />
                 </div>
               ))}
@@ -126,7 +130,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                   <button
                     type="button"
                     id="detail-prev-btn"
-                    class="absolute left-3.5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all z-20 cursor-pointer"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all z-20 cursor-pointer"
                     aria-label="Previous image"
                   >
                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +141,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                   <button
                     type="button"
                     id="detail-next-btn"
-                    class="absolute right-3.5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all z-20 cursor-pointer"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all z-20 cursor-pointer"
                     aria-label="Next image"
                   >
                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,7 +150,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                   </button>
 
                   <!-- Slide Counter Pill -->
-                  <div class="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-xs font-mono font-medium border border-white/10 z-20">
+                  <div class="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-mono font-bold border border-white/10 z-20">
                     <span id="current-slide-num">1</span> / <span>{displayImages.length}</span>
                   </div>
                 </>
@@ -155,9 +159,9 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
             <!-- Optional Video Player -->
             {videoUrl && (
-              <div class="mt-6 rounded-2xl overflow-hidden bg-black border border-[#EAE8E3] dark:border-[#27272A] shadow-lg">
-                <div class="px-4 py-2 bg-black/40 text-xs font-semibold text-gray-300 border-b border-white/10 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-red-400 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              <div class="mt-6 rounded-2xl overflow-hidden bg-black border border-black/[0.08] dark:border-white/10 shadow-xl">
+                <div class="px-4 py-2.5 bg-black/60 text-xs font-bold uppercase tracking-wider text-gray-300 border-b border-white/10 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
                   <span>Video Preview</span>
                 </div>
                 <video
@@ -174,21 +178,24 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
           </section>
         )}
 
-        <!-- 3D Action Bar (Download Repo ZIP, GitHub Repo Link, Live Demo) -->
-        <div class="sticky top-16 z-30 mb-12 p-3 sm:p-4 rounded-2xl bg-white/90 dark:bg-[#18181B]/90 backdrop-blur-md border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_10px_30px_-8px_rgba(0,0,0,0.08)] flex flex-wrap items-center gap-3">
-          <!-- Download Repo ZIP Button -->
+        <!-- 3D Action Bar with Spinning Border Beam CTA -->
+        <div class="sticky top-16 z-30 mb-14 p-3.5 sm:p-4 rounded-2xl bg-white/85 dark:bg-[#14151f]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/10 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.12)] flex flex-wrap items-center gap-3">
+          <!-- Download Repo ZIP Button with Animated Conic Gradient Beam -->
           {downloadUrl && (
-            <a
-              href={downloadUrl}
-              target={project.download?.isExternal ? "_blank" : "_self"}
-              download
-              class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-            >
-              <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span>Download Project ZIP</span>
-            </a>
+            <div class="relative p-[1px] rounded-xl overflow-hidden shadow-md shadow-indigo-500/20 group">
+              <div class="absolute inset-[-100%] bg-[conic-gradient(from_0deg,transparent_0_300deg,#6366f1_340deg,#a855f7_360deg)] animate-beam-spin"></div>
+              <a
+                href={downloadUrl}
+                target={project.download?.isExternal ? "_blank" : "_self"}
+                download
+                class="relative z-10 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-md transition-all hover:scale-[1.02] active:scale-95"
+              >
+                <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Download Project (.zip)</span>
+              </a>
+            </div>
           )}
 
           <!-- GitHub Repo Link Button -->
@@ -197,12 +204,12 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-[#FAF9F6] dark:bg-[#111113] border border-[#EAE8E3] dark:border-[#27272A] hover:border-gray-400 dark:hover:border-gray-600 text-gray-900 dark:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all shadow-sm"
+              class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/80 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 hover:border-gray-400 dark:hover:border-gray-500 text-gray-900 dark:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all shadow-sm"
             >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
               </svg>
-              <span>GitHub Repository</span>
+              <span>GitHub Repo</span>
             </a>
           )}
 
@@ -212,7 +219,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] hover:border-indigo-500 text-gray-900 dark:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all shadow-sm"
+              class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/80 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 hover:border-indigo-500 text-gray-900 dark:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all shadow-sm"
             >
               <svg class="w-4 h-4 text-indigo-500 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -224,14 +231,14 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
         <!-- Key Features Cards -->
         {project.features && project.features.length > 0 && (
-          <section class="mb-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)]">
-            <h2 class="text-xl font-bold text-gray-950 dark:text-white mb-5 flex items-center gap-2">
+          <section class="mb-12 p-6 sm:p-8 rounded-2xl bg-white/85 dark:bg-[#14151f]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.06)] corner-crosshair">
+            <h2 class="text-xl font-bold text-gray-950 dark:text-white mb-5 flex items-center gap-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
               Key Highlights & Features
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {project.features.map((feature: string) => (
-                <div class="p-3.5 rounded-xl bg-gray-50/70 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 flex items-start gap-3">
+                <div class="p-4 rounded-xl bg-gray-50/70 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/5 flex items-start gap-3">
                   <svg class="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                   </svg>
@@ -244,10 +251,10 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
         <!-- Documentation: Rendered README.md -->
         {project.readmeHtml && (
-          <section class="mb-12 p-6 sm:p-10 rounded-2xl bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)]">
-            <div class="flex items-center justify-between border-b border-[#EAE8E3] dark:border-[#27272A] pb-4 mb-6">
+          <section class="mb-12 p-6 sm:p-10 rounded-2xl bg-white/85 dark:bg-[#14151f]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.06)] corner-crosshair">
+            <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/10 pb-4 mb-6">
               <h2 class="text-xl font-bold text-gray-950 dark:text-white flex items-center gap-2">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Project Documentation (README)
@@ -257,15 +264,15 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                  class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-bold"
                 >
-                  View original on GitHub →
+                  View on GitHub →
                 </a>
               )}
             </div>
 
             <div
-              class="prose prose-stone dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-img:rounded-xl prose-pre:rounded-xl prose-pre:bg-gray-950 prose-pre:border prose-pre:border-gray-800"
+              class="prose prose-stone dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-img:rounded-xl prose-pre:rounded-xl prose-pre:bg-[#0c0d12] prose-pre:border prose-pre:border-white/10"
               set:html={project.readmeHtml}
             />
           </section>
@@ -273,7 +280,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
         <!-- Prerequisites & Quick Setup -->
         {(project.prerequisites?.length || project.installation?.length || project.usage?.length) && (
-          <section class="mb-12 p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#18181B] border border-[#EAE8E3] dark:border-[#27272A] shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)] space-y-6">
+          <section class="mb-12 p-6 sm:p-8 rounded-2xl bg-white/85 dark:bg-[#14151f]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.06)] space-y-6">
             <h2 class="text-xl font-bold text-gray-950 dark:text-white">Quick Start & Setup</h2>
 
             {project.prerequisites && project.prerequisites.length > 0 && (
@@ -288,7 +295,7 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
             {project.installation && project.installation.length > 0 && (
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Installation Commands</h3>
-                <div class="bg-gray-950 p-4 rounded-xl font-mono text-xs text-emerald-400 space-y-1 overflow-x-auto border border-gray-800">
+                <div class="bg-[#0c0d12] p-4 rounded-xl font-mono text-xs text-emerald-400 space-y-1 overflow-x-auto border border-white/10">
                   {project.installation.map((cmd: string) => <div>$ {cmd}</div>)}
                 </div>
               </div>
@@ -307,17 +314,17 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
 
         <!-- Next / Previous Navigation -->
         {(previousProject || nextProject) && (
-          <nav class="flex justify-between items-center pt-8 border-t border-[#EAE8E3] dark:border-[#27272A]">
+          <nav class="flex justify-between items-center pt-8 border-t border-black/[0.06] dark:border-white/10">
             {previousProject ? (
               <a
                 href={`/projects/${previousProject.slug}/`}
                 class="flex items-center gap-3 p-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all text-sm group"
               >
-                <div class="w-8 h-8 rounded-full bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:-translate-x-1 transition-transform">
+                <div class="w-9 h-9 rounded-full bg-white dark:bg-white/5 border border-black/[0.06] dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:-translate-x-1 transition-transform shadow-sm">
                   ←
                 </div>
                 <div>
-                  <div class="text-[11px] text-gray-400 uppercase">Previous</div>
+                  <div class="text-[11px] text-gray-400 uppercase font-mono">Previous Project</div>
                   <div class="font-bold text-gray-900 dark:text-white">{previousProject.title}</div>
                 </div>
               </a>
@@ -329,10 +336,10 @@ const nextProject = currentIndex < projectsData.length - 1 ? projectsData[curren
                 class="flex items-center gap-3 p-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all text-sm group"
               >
                 <div class="text-right">
-                  <div class="text-[11px] text-gray-400 uppercase">Next</div>
+                  <div class="text-[11px] text-gray-400 uppercase font-mono">Next Project</div>
                   <div class="font-bold text-gray-900 dark:text-white">{nextProject.title}</div>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-white dark:bg-[#18181B] border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:translate-x-1 transition-transform">
+                <div class="w-9 h-9 rounded-full bg-white dark:bg-white/5 border border-black/[0.06] dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:translate-x-1 transition-transform shadow-sm">
                   →
                 </div>
               </a>
