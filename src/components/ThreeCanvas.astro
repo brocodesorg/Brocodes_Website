@@ -4,9 +4,9 @@
 
 <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden select-none" id="three-canvas-container" aria-hidden="true">
   <canvas id="three-webgl-canvas" class="w-full h-full block"></canvas>
-  <!-- Ambient Gradient Glow Overlays for Extra 3D Depth -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl pointer-events-none dark:from-indigo-600/15 dark:via-purple-600/10"></div>
-  <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-t from-violet-500/5 to-transparent blur-3xl pointer-events-none dark:from-indigo-900/10"></div>
+  <!-- Ambient Gradient Glow Overlays for Extra 3D Depth matching Robot Logo palette -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-cyan-500/10 via-purple-500/10 to-transparent blur-3xl pointer-events-none dark:from-cyan-500/15 dark:via-purple-600/15"></div>
+  <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-t from-indigo-500/10 to-transparent blur-3xl pointer-events-none dark:from-cyan-900/15"></div>
 </div>
 
 <script>
@@ -41,21 +41,30 @@
       return document.documentElement.classList.contains('dark');
     }
 
-    let particleColor = isDarkMode() ? 0x818cf8 : 0x6366f1;
-    let lineColor = isDarkMode() ? 0x4f46e5 : 0xa5b4fc;
-    let particleOpacity = isDarkMode() ? 0.8 : 0.65;
-    let lineOpacity = isDarkMode() ? 0.25 : 0.18;
+    let particleOpacity = isDarkMode() ? 0.85 : 0.65;
+    let lineOpacity = isDarkMode() ? 0.3 : 0.2;
 
-    // 3. Particle Cloud Generation
-    const particleCount = window.innerWidth < 768 ? 65 : 120;
-    const maxDistance = window.innerWidth < 768 ? 12 : 14;
+    // 3. Multi-Color Particle Cloud (Cyan, Indigo, Purple, Chrome)
+    const particleCount = window.innerWidth < 768 ? 85 : 155;
+    const maxDistance = window.innerWidth < 768 ? 13 : 15;
 
     const positions = new Float32Array(particleCount * 3);
+    const particleColors = new Float32Array(particleCount * 3);
     const velocities: { x: number; y: number; z: number }[] = [];
 
-    const rangeX = 70;
-    const rangeY = 45;
-    const rangeZ = 30;
+    const rangeX = 75;
+    const rangeY = 48;
+    const rangeZ = 32;
+
+    // Palette inspired by the 3D robot & BroCodes sign
+    const colorChoices = [
+      new THREE.Color(0x38bdf8), // Cyan
+      new THREE.Color(0x06b6d4), // Electric Teal
+      new THREE.Color(0xa855f7), // Purple
+      new THREE.Color(0xc084fc), // Bright Violet
+      new THREE.Color(0x818cf8), // Indigo
+      new THREE.Color(0xe0e7ff), // Chrome
+    ];
 
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
@@ -63,15 +72,22 @@
       positions[i3 + 1] = (Math.random() - 0.5) * rangeY;
       positions[i3 + 2] = (Math.random() - 0.5) * rangeZ;
 
+      const c = colorChoices[Math.floor(Math.random() * colorChoices.length)];
+      particleColors[i3] = c.r;
+      particleColors[i3 + 1] = c.g;
+      particleColors[i3 + 2] = c.b;
+
+      // Higher frequency velocity for livelier organic motion
       velocities.push({
-        x: (Math.random() - 0.5) * 0.04,
-        y: (Math.random() - 0.5) * 0.04,
-        z: (Math.random() - 0.5) * 0.03
+        x: (Math.random() - 0.5) * 0.055,
+        y: (Math.random() - 0.5) * 0.055,
+        z: (Math.random() - 0.5) * 0.04
       });
     }
 
     const particlesGeometry = new THREE.BufferGeometry();
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
 
     // Custom circle texture for soft glowing particles
     function createCircleTexture() {
@@ -82,7 +98,7 @@
       const ctx = c.getContext('2d')!;
       const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
       grad.addColorStop(0, 'rgba(255,255,255,1)');
-      grad.addColorStop(0.3, 'rgba(255,255,255,0.8)');
+      grad.addColorStop(0.35, 'rgba(255,255,255,0.85)');
       grad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, size, size);
@@ -93,8 +109,8 @@
     const particleTexture = createCircleTexture();
 
     const particlesMaterial = new THREE.PointsMaterial({
-      color: particleColor,
-      size: 1.6,
+      size: 1.8,
+      vertexColors: true,
       map: particleTexture,
       transparent: true,
       opacity: particleOpacity,
@@ -125,28 +141,28 @@
     const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
     scene.add(linesMesh);
 
-    // 5. Ambient Floating 3D Geometric Wireframe (Torus Knot / Icosahedron)
+    // 5. Ambient Floating 3D Geometric Wireframes
     const geoGroup = new THREE.Group();
-    const torusGeo = new THREE.IcosahedronGeometry(7, 1);
+    const torusGeo = new THREE.IcosahedronGeometry(7.5, 1);
     const torusMat = new THREE.MeshBasicMaterial({
-      color: isDarkMode() ? 0x6366f1 : 0x818cf8,
+      color: isDarkMode() ? 0x38bdf8 : 0x0284c7,
       wireframe: true,
       transparent: true,
-      opacity: isDarkMode() ? 0.15 : 0.08
+      opacity: isDarkMode() ? 0.18 : 0.08
     });
     const torusMesh = new THREE.Mesh(torusGeo, torusMat);
-    torusMesh.position.set(24, 8, -10);
+    torusMesh.position.set(25, 9, -10);
     geoGroup.add(torusMesh);
 
-    const torus2Geo = new THREE.TorusGeometry(5, 1.2, 12, 36);
+    const torus2Geo = new THREE.TorusGeometry(5.5, 1.2, 12, 36);
     const torus2Mat = new THREE.MeshBasicMaterial({
-      color: isDarkMode() ? 0xa855f7 : 0xc084fc,
+      color: isDarkMode() ? 0xa855f7 : 0x7c3aed,
       wireframe: true,
       transparent: true,
-      opacity: isDarkMode() ? 0.12 : 0.06
+      opacity: isDarkMode() ? 0.15 : 0.07
     });
     const torus2Mesh = new THREE.Mesh(torus2Geo, torus2Mat);
-    torus2Mesh.position.set(-26, -10, -15);
+    torus2Mesh.position.set(-27, -11, -15);
     geoGroup.add(torus2Mesh);
 
     scene.add(geoGroup);
@@ -162,8 +178,8 @@
       const normY = -(e.clientY / window.innerHeight) * 2 + 1;
       mouseX = normX;
       mouseY = normY;
-      targetCameraX = normX * 4;
-      targetCameraY = normY * 3;
+      targetCameraX = normX * 4.5;
+      targetCameraY = normY * 3.5;
     }
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
@@ -178,17 +194,15 @@
     // 8. Theme Change Watcher
     const observer = new MutationObserver(() => {
       const dark = isDarkMode();
-      particleColor = dark ? 0x818cf8 : 0x6366f1;
-      lineColor = dark ? 0x4f46e5 : 0xa5b4fc;
-      particleOpacity = dark ? 0.8 : 0.65;
-      lineOpacity = dark ? 0.25 : 0.18;
+      particleOpacity = dark ? 0.85 : 0.65;
+      lineOpacity = dark ? 0.3 : 0.2;
 
-      particlesMaterial.color.setHex(particleColor);
       particlesMaterial.opacity = particleOpacity;
       linesMaterial.opacity = lineOpacity;
-      torusMat.color.setHex(dark ? 0x6366f1 : 0x818cf8);
-      torusMat.opacity = dark ? 0.15 : 0.08;
-      torus2Mat.color.setHex(dark ? 0xa855f7 : 0xc084fc);
+      torusMat.color.setHex(dark ? 0x38bdf8 : 0x0284c7);
+      torusMat.opacity = dark ? 0.18 : 0.08;
+      torus2Mat.color.setHex(dark ? 0xa855f7 : 0x7c3aed);
+      torus2Mat.opacity = dark ? 0.15 : 0.07;
     });
 
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
@@ -220,28 +234,24 @@
       const elapsed = clock.getElapsedTime();
 
       // Smooth camera interpolation
-      camera.position.x += (targetCameraX - camera.position.x) * 0.03;
-      camera.position.y += (targetCameraY - camera.position.y - (scrollY * 0.015)) * 0.03;
+      camera.position.x += (targetCameraX - camera.position.x) * 0.035;
+      camera.position.y += (targetCameraY - camera.position.y - (scrollY * 0.015)) * 0.035;
       camera.lookAt(0, -scrollY * 0.015, 0);
 
       // Rotate geometric wireframes
-      torusMesh.rotation.x = elapsed * 0.15;
-      torusMesh.rotation.y = elapsed * 0.2;
-      torus2Mesh.rotation.x = -elapsed * 0.12;
-      torus2Mesh.rotation.z = elapsed * 0.1;
+      torusMesh.rotation.x = elapsed * 0.22;
+      torusMesh.rotation.y = elapsed * 0.28;
+      torus2Mesh.rotation.x = -elapsed * 0.18;
+      torus2Mesh.rotation.z = elapsed * 0.16;
 
       // Update particle positions and velocities
       const posArray = particlesGeometry.attributes.position.array as Float32Array;
+      const partColArray = particlesGeometry.attributes.color.array as Float32Array;
       const linePosArray = linesGeometry.attributes.position.array as Float32Array;
       const lineColArray = linesGeometry.attributes.color.array as Float32Array;
 
       let vertexIndex = 0;
       let colorIndex = 0;
-
-      const dark = isDarkMode();
-      const r = dark ? 0.5 : 0.39;
-      const g = dark ? 0.55 : 0.40;
-      const b = dark ? 0.97 : 0.95;
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
@@ -256,7 +266,7 @@
         if (Math.abs(posArray[i3 + 1]) > rangeY / 2) velocities[i].y *= -1;
         if (Math.abs(posArray[i3 + 2]) > rangeZ / 2) velocities[i].z *= -1;
 
-        // Inter-particle line connections
+        // Inter-particle line connections with blended colors
         for (let j = i + 1; j < particleCount; j++) {
           const j3 = j * 3;
           const dx = posArray[i3] - posArray[j3];
@@ -275,13 +285,14 @@
             linePosArray[vertexIndex++] = posArray[j3 + 1];
             linePosArray[vertexIndex++] = posArray[j3 + 2];
 
-            lineColArray[colorIndex++] = r * alpha;
-            lineColArray[colorIndex++] = g * alpha;
-            lineColArray[colorIndex++] = b * alpha;
+            // Blend colors of particle i and particle j
+            lineColArray[colorIndex++] = partColArray[i3] * alpha;
+            lineColArray[colorIndex++] = partColArray[i3 + 1] * alpha;
+            lineColArray[colorIndex++] = partColArray[i3 + 2] * alpha;
 
-            lineColArray[colorIndex++] = r * alpha;
-            lineColArray[colorIndex++] = g * alpha;
-            lineColArray[colorIndex++] = b * alpha;
+            lineColArray[colorIndex++] = partColArray[j3] * alpha;
+            lineColArray[colorIndex++] = partColArray[j3 + 1] * alpha;
+            lineColArray[colorIndex++] = partColArray[j3 + 2] * alpha;
           }
         }
       }
