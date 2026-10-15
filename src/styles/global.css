@@ -2,33 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 3D and Theme Variables */
+/* ThreeUI-inspired 3D Tokens & Variables */
 :root {
   --color-bg: #FAF9F6;
   --color-surface: #FFFFFF;
-  --color-surface-hover: #FDFDFD;
+  --color-surface-card: rgba(255, 255, 255, 0.85);
   --color-border: #EAE8E3;
+  --color-border-glow: rgba(99, 102, 241, 0.25);
   --color-text: #18181B;
   --color-text-secondary: #52525B;
   --color-accent: #4F46E5;
-  --color-accent-hover: #4338CA;
+  --color-accent-glow: rgba(79, 70, 229, 0.35);
 
-  --shadow-3d: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-3d-hover: 0 20px 40px -12px rgba(79, 70, 229, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+  --shadow-3d: 0 12px 30px -10px rgba(0, 0, 0, 0.07), 0 4px 8px -2px rgba(0, 0, 0, 0.03);
+  --shadow-3d-hover: 0 24px 48px -12px rgba(79, 70, 229, 0.16), 0 12px 20px -4px rgba(0, 0, 0, 0.08);
 }
 
 :root.dark {
-  --color-bg: #111113;
-  --color-surface: #18181B;
-  --color-surface-hover: #1F1F23;
-  --color-border: #27272A;
+  --color-bg: #0C0D12;
+  --color-surface: #14151C;
+  --color-surface-card: rgba(20, 21, 28, 0.75);
+  --color-border: #232533;
+  --color-border-glow: rgba(129, 140, 248, 0.35);
   --color-text: #F4F4F5;
   --color-text-secondary: #A1A1AA;
   --color-accent: #6366F1;
-  --color-accent-hover: #818CF8;
+  --color-accent-glow: rgba(99, 102, 241, 0.5);
 
-  --shadow-3d: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-3d-hover: 0 20px 40px -12px rgba(99, 102, 241, 0.25), 0 8px 16px -4px rgba(0, 0, 0, 0.5);
+  --shadow-3d: 0 14px 34px -10px rgba(0, 0, 0, 0.7), 0 6px 10px -2px rgba(0, 0, 0, 0.5);
+  --shadow-3d-hover: 0 28px 56px -12px rgba(99, 102, 241, 0.3), 0 14px 24px -4px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -44,65 +46,174 @@ body {
   color: var(--color-text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
   line-height: 1.6;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Subtle 3D background texture */
-body::before {
-  content: '';
-  position: fixed;
+/* 3D Animations from ThreeUI */
+@keyframes beam-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer-move {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-beam-spin {
+  animation: beam-spin 4s linear infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* 3D Interactive Card Styles with Specular Glare & Tilt */
+.tilt-card-wrapper {
+  perspective: 1200px;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out;
+  position: relative;
+  background: var(--color-surface-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.tilt-card .card-glare {
+  position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+  z-index: 15;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.22), transparent 70%);
+  transition: opacity 0.3s ease;
 }
 
-.dark body::before {
-  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+.dark .tilt-card .card-glare {
+  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.12), transparent 70%);
 }
 
-/* Custom 3D utilities */
-.card-3d {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-3d);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.tilt-card:hover .card-glare {
+  opacity: 1;
 }
 
-.card-3d:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-3d-hover);
-  border-color: rgba(99, 102, 241, 0.3);
+/* Glowing Border Beam Wrapper */
+.beam-border-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1px;
+  overflow: hidden;
+  background: var(--color-border);
+  transition: all 0.3s ease;
 }
 
-/* Focus styles */
-*:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+.beam-border-card::before {
+  content: '';
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(from 0deg, transparent 0 310deg, #6366f1 340deg, #a855f7 360deg);
+  animation: beam-spin 4.5s linear infinite;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
 }
 
-/* Links */
-a {
-  color: inherit;
-  text-decoration: none;
+.beam-border-card:hover::before {
+  opacity: 1;
 }
 
-/* Buttons */
-button {
-  cursor: pointer;
-  font-family: inherit;
+.beam-border-card > * {
+  position: relative;
+  z-index: 1;
+  background: var(--color-surface-card);
+  border-radius: inherit;
+}
+
+/* ThreeUI Technical Crosshairs & Corner Brackets */
+.corner-crosshair {
+  position: relative;
+}
+
+.corner-crosshair::before,
+.corner-crosshair::after {
+  content: '+';
+  position: absolute;
+  font-family: monospace;
+  font-size: 11px;
+  color: rgba(99, 102, 241, 0.4);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.corner-crosshair::before {
+  top: 6px;
+  left: 6px;
+}
+
+.corner-crosshair::after {
+  bottom: 6px;
+  right: 6px;
+}
+
+/* Shimmering Text Gradient */
+.text-shimmer {
+  background: linear-gradient(90deg, #6366f1 0%, #a855f7 25%, #ec4899 50%, #6366f1 75%, #a855f7 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer-move 6s linear infinite;
 }
 
 /* Code blocks */
 pre {
-  background: #18181B;
+  background: #0f1015;
   color: #F4F4F5;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   padding: 1.25rem;
   overflow-x: auto;
   font-size: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 code {
@@ -114,7 +225,7 @@ code {
 }
 
 .dark code {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 pre code {
@@ -123,31 +234,11 @@ pre code {
   font-size: inherit;
 }
 
-/* Tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-th, td {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
-  text-align: left;
-}
-
-th {
-  background: rgba(0, 0, 0, 0.02);
-  font-weight: 600;
-}
-
-.dark th {
-  background: rgba(255, 255, 255, 0.03);
-}
-
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  ::before,
+  ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
